@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="notificationClient:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/notificationClient_war_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="notificationClient" />
+        </element>
+        <element id="file-copy" path="$PROJECT_DIR$/notificationClient/web/WEB-INF/web.xml" />
+      </element>
+      <element id="javaee-facet-resources" facet="notificationClient/web/Web" />
+    </root>
+  </artifact>
+</component>
