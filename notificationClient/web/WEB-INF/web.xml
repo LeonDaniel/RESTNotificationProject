@@ -16,4 +16,9 @@
         <url-pattern>/consume</url-pattern>
     </servlet-mapping>
 
+    <listener>
+        <description>sessionListener</description>
+        <listener-class>ro.jms.client.listeners.HttpSessionListener</listener-class>
+    </listener>
+
 </web-app>

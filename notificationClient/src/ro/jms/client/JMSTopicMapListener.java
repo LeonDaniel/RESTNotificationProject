@@ -29,8 +29,7 @@ public class JMSTopicMapListener implements MessageListener {
                         subject +
                         "\nTopic: " +
                         topicName +
-                        "\nContent: " + content+
-                        "\nResource: " + resource);
+                        "\nContent: " + content);
             } else {
                 System.out.println("Wrong type");
             }

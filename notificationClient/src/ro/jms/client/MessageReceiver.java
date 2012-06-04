@@ -124,8 +124,8 @@ public class MessageReceiver extends HttpServlet {
             topicSubscriber.setMessageListener(topicListener);
             topicConnection.start();
             System.out.println("Subscripted to topic: \"" + destName + "\"");
-            while (true) {
-            }
+//            while (true) {
+//            }
         } catch (JMSException e) {
             System.out.println("Exception occurred: " + e.toString());
         } finally {
