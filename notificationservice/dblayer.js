@@ -28,8 +28,67 @@ _exports.authenticate=function(username,password,_cb/*_err,authorized,{username:
 			
 		}
 	});
-	_cb(null,true,{username:username});
+	_cb(null,true,{username:username, admin: true});
 }
+
+_exports.CheckUser=function(username,_cb/*_err,{username:string, admin: bool}*/)
+{
+  _cb(null,null);
+}
+
+_exports.GetTopicInfo = function(topic, _cb/*_err,topic*/) {
+  // null or {insertDate: ...};
+  _cb(null,null);
+}
+
+_exports.GetFullTopicInfo = function(topic, _cb/*_err,topic*/) {
+  // null or {insertDate: ..., resources: [ 'asd', ...] };
+  _cb(null,null);
+}
+
+_exports.AddTopic = function(topic, _cb/*_err*/) {
+  _cb(null);
+}
+
+_exports.DeleteTopic = function(topic, _cb/*_err*/) {
+  _cb(null);
+}
+
+_exports.GetResourceInfo = function(topic, resource, _cb/*_err,resource*/) {
+  //null or { lastModified: ..., content: ... }
+  _cb(null,null);
+}
+
+_exports.AddResource = function(topic, resource, content, _cb/*_err*/) {
+  _cb(null);
+}
+
+_exports.UpdateResource = function(topic, resource, content, _cb/*_err*/) {
+  _cb(null);
+}
+
+_exports.DeleteResource = function(topic, resource, content, _cb/*_err*/) {
+  _cb(null);
+}
+
+_exports.GetNotificationInfo = function (topic, user, _cb/*_err, notif*/) {
+  //null or {  status: ..., msg_nr: ...  }
+  _cb(null,null);
+}
+
+_exports.AddNotification = function (topic, user, _cb/*_err*/) {
+  _cb(null);
+}
+
+_exports.DeleteNotification = function (topic, user, _cb/*_err*/) {
+  _cb(null);
+}
+
+
+
+
+
+
 
 _exports.getResourceInformation=function(objauth,resourceStr,_cb/*response*/)
 {

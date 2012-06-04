@@ -33,10 +33,8 @@ serverhttp.use(
 	})
 );
 serverhttp.use(connect.router( function( app ) {
-	app.all( '/*' , function( _req , _res ) {
-		//extracting the path
-		var resource_path=_req.params[0]
-	
+	app.all( '/:service/*' , function( _req , _res ) {
+
 		//extracting the parameters as an array
 		var resource_url_params_arr=
 			(function(json){ var arr=[]; for (var key in json) arr.push({k:key, o:json[key]}); return arr; })
@@ -49,41 +47,209 @@ serverhttp.use(connect.router( function( app ) {
 				return querystring.stringify(obj); })
 			(resource_url_params_arr);
 		//generating the resource identifying string
-		var resourceStr='/'+resource_path+((resource_url_params_sorted.length==0)?'':'?'+resource_url_params_sorted);
-
+		//var fullResourceStr='/'+resource_path+((resource_url_params_sorted.length==0)?'':'?'+resource_url_params_sorted);
+	
+		//extracting other necessary information
+		var service = _req.params.service;
+		var topic = '/'+_req.params[0];
+		var resourceName = resource_url_params_sorted;
+		var resourceContent = _req.body;
+		var userInfo = _req.remoteUser;
 		var method=_req.method;
-		switch (method)
-		{
-			case 'GET':
-			{
-				dblayer.getResourceInformation(_req.remoteUser,resourceStr,function(response){
-					_res.writeHead(200, {'Content-type':'application/json'});
-					_res.end(JSON.stringify(response));
-				});
-				break;
-			}
-			case 'POST':
-			{
-				dblayer.createResource(_req.remoteUser,resourceStr,function(response){
-					_res.writeHead(200, {'Content-type':'application/json'});
-					_res.end(JSON.stringify(response));
-				});
-				break;
-			}
-			case 'DELETE':
-			{
-				dblayer.deleteResource(_req.remoteUser,resourceStr,function(response){
-					_res.writeHead(200, {'Content-type':'application/json'});
-					_res.end(JSON.stringify(response));
-				});
-				break;
-			}
-			default:
-			_res.writeHead(200);
-			_res.end('Unimplemented');
-		}
+
+		ProcessQuery(service,method,topic,resourceName,resourceContent,userInfo,function(result){
+console.log(JSON.stringify(result));
+			_res.writeHead(200, {'Content-type':'application/json'});
+			_res.end(JSON.stringify(result));
+		});
 	});
 }));
+
+function ProcessQuery(service, method, topic, resourceName, resourceContent, userInfo, _cb) {
+  switch (service) {
+    case 'TOPIC':
+      ProcessTopic(method, topic, resourceName, resourceContent, userInfo, _cb)
+      break;
+    case 'MESSAGE':
+      ProcessMessage(method, topic, resourceName, resourceContent, userInfo, _cb)
+      break;
+    case 'NOTIFICATION':
+      ProcessNotification(method, topic, resourceName, resourceContent, userInfo, _cb)
+      break;
+    default:
+      _cb({ error: true, error_string: 'Unknown service' });
+      break;
+  }
+}
+
+function ProcessTopic(method, topic, resourceName, resourceContent, userInfo, _cb) { 
+  switch (method) {
+    case 'POST':   //C
+      if (!IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo!=null) { _cb({ error: true, error_string: 'Existing topic' }); return; }
+        dblayer.AddTopic(topic, function(_err) {
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          _cb({ error:false }); return;
+        });
+      });
+      break;
+    case 'GET':    //R
+      dblayer.GetFullTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+	_cb({ error:false, insertDate: topicInfo.insertDate, resources: topicInfo.resources}); return;
+      });
+      break;
+    case 'PUT':    //U
+      _cb({ error: true, error_string: 'Not implemented' });
+      break;
+    case 'DELETE': //D
+      if (!IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.DeleteTopic(topic, function(_err) {
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          _cb({ error:false }); return;
+        });
+      });
+      break;
+  }
+}
+
+function ProcessMessage(method, topic, resourceName, resourceContent, userInfo, _cb) {
+  switch (method) {
+    case 'POST':   //C
+      if (!IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.GetResourceInfo(topic, resourceName, function (_err, resource) {
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          if (resource != null) { _cb({ error: true, error_string: 'Existing resource' }); return; }
+          dblayer.AddResource(topic, resourceName, resourceContent, function (_err) {
+            if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+            _cb({ error:false }); return;
+          });
+        });
+      });
+      break;
+    case 'GET':    //R
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.GetResourceInfo(topic, resourceName, function (_err, resource) {
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          if (resource == null) { _cb({ error: true, error_string: 'Resource does not exist' }); return; }
+          _cb({ error:false, lastModified: resource.lastModified, content: resource.content }); return;
+        });
+      });
+      break;
+    case 'PUT':    //U
+      if (!IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.GetResourceInfo(topic, resourceName, function (_err, resource) {
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          if (resource == null) { _cb({ error: true, error_string: 'Resource does not exist' }); return; }
+          dblayer.UpdateResource(topic, resourceName, resourceContent, function (_err) {
+            if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+            _cb({ error:false }); return;
+          });
+        });
+      });
+      break;
+    case 'DELETE': //D
+      if (!IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.GetResourceInfo(topic, resourceName, function (_err, resource) {
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          if (resource == null) { _cb({ error: true, error_string: 'Resource does not exist' }); return; }
+          dblayer.DeleteResource(topic, resourceName, resourceContent, function (_err) {
+            if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+            _cb({ error:false }); return;
+          });
+        });
+      });
+      break;
+  }
+}
+
+function ProcessNotification(method, topic, resourceName, resourceContent, userInfo, _cb) {
+  var meta = querystring.parse(resourceName);
+  var notificationUser=userInfo.username;
+  if ('user' in meta) notificationUser=meta.user;
+  var messagesNumber=5;
+  if ('nr_msg' in meta) messagesNumber=meta.nr_msg;
+  switch (method) {
+    case 'POST':   //C
+      if (!IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.CheckUser(meta.user,function(_err,usrInf){
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          if (usrInf==null) { _cb({ error: true, error_string: 'User does not exist' }); return; }
+          dblayer.GetNotificationInfo(topic, meta.user, function (_err,notif) {
+            if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+            if (notif!=null) { _cb({ error: true, error_string: 'User is already subscribed' }); return; }
+            dblayer.AddNotification(topic, meta.user, function (_err) {
+              if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+              _cb({ error:false}); return;
+            });
+          });
+        });  
+      });
+      break;
+    case 'GET':    //R
+      if ( meta.user!=userInfo.username && !IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.CheckUser(meta.user,function(_err,usrInf){
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          if (usrInf==null) { _cb({ error: true, error_string: 'User does not exist' }); return; }
+          dblayer.GetNotificationInfo(topic, meta.user, function (_err,notif) {
+            if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+            if (notif==null) { _cb({ error: true, error_string: 'User is not subscribed' }); return; }
+            _cb({ error:false, msg_nr: notif.msg_nr, status: notif.status }); return;
+          });
+        });
+      });
+      break;
+    case 'PUT':    //U
+      _cb({ error: true, error_string: 'Not implemented' });
+      break;
+    case 'DELETE': //D
+      if (!IsAdmin(userInfo)) { _cb({ error: true, error_string: 'No rights' }); return; }
+      dblayer.GetTopicInfo(topic,function (_err,topicInfo) {
+        if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+        if (topicInfo==null) { _cb({ error: true, error_string: 'Topic does not exist' }); return; }
+        dblayer.CheckUser(meta.user,function(_err,usrInf){
+          if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+          if (usrInf==null) { _cb({ error: true, error_string: 'User does not exist' }); return; }
+          dblayer.GetNotificationInfo(topic, meta.user, function (_err,notif) {
+            if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+            if (notif==null) { _cb({ error: true, error_string: 'User is not subscribed' }); return; }
+            dblayer.DeleteNotification(topic, meta.user, function (_err) {
+              if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
+              _cb({ error:false}); return;
+            });
+          });
+        });  
+      });
+      break;
+  }
+}
+
+function IsAdmin(userInfo) {
+  return ('admin' in userInfo && userInfo.admin);
+}
 
 serverhttp.listen( config.port , config.host ); 
 console.log('Started server on '+config.host+':'+config.port);
