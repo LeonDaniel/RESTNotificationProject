@@ -2,8 +2,8 @@ var os = require ( 'os' );
 
 module.exports = 
 {
-	host: '172.21.36.46',
-	port: 1337,
+	host: '192.168.1.102',
+	port: 80,
 	https: 
 	{
 		use: false,

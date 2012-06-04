@@ -1,55 +1,146 @@
 var mysql=require("./node-mysql");
 
-var users_table='USERS';
 
-var client_users = mysql.createClient({
+var sql_client = mysql.createClient({
 	host: 'localhost',
 	port: 3306,
 	user: 'root',
-	password: 'root',
-	database: 'pos'
+	password: '',
+	schema: 'messages'
 });
-
-//client.query('CREATE TABLE USERS (user VARCHAR(255), password VARCHAR(255))');
-//client.query('CREATE TABLE NOTIFRES (resource VARCHAR(255), user VARCHAR(255), connection VARCHAR(255))');
-
-
 
 var _exports = {}
 
 
-_exports.authenticate=function(username,password,_cb/*_err,authorized,{username:string}*/)
+_exports.authenticate=function(username,password,_cb/*_err,authorized,{username:string, admin:bool}*/)
 {
-	console.log("Authentication successfull for user ["+username+ "] with pw ["+password+"]");
-//	client_users.query('INSERT INTO USERS SET user = ?, password = ?',[username,password]);
-	client_users.query('SELECT * FROM USERS where user = ?',[username],function (err,results,fields) {
-		if (typeof(results)!='undefined')
-		{
-			
-		}
-	});
-	_cb(null,true,{username:username});
+  sql_client.query('SELECT * FROM messages.USERS where USERNAME = ? AND PASSWORD = ?',[username, password],function (err,results,fields) {
+    if (err) { _cb(err); return; }
+    if (typeof(results)!='undefined' && results.length!=0) {
+      _cb(null,true,{username:username, admin: true});
+      console.log("Authentication successfull for user ["+username+ "] with pw ["+password+"]");
+    }
+    else {
+      _cb(null,false);
+    }
+  });
 }
 
-_exports.getResourceInformation=function(objauth,resourceStr,_cb/*response*/)
+_exports.CheckUser=function(username,_cb/*_err,{username:string, admin: bool}*/)
 {
-	console.log("User ["+objauth.username+"] requesting "+resourceStr);
-
-	_cb({error:false, ready:false});
+  sql_client.query('SELECT * FROM messages.USERS where USERNAME = ?',[username],function (err,results,fields) {
+    if (err) { _cb(err); return; }
+    if (typeof(results)!='undefined' && results.length!=0) {
+      _cb(null,{username:results[0].USERNAME, admin: true});
+    }
+    else {
+      _cb(null,null);
+    }
+  });
 }
 
-_exports.createResource=function(objauth,resourceStr,_cb/*response*/)
-{
-	console.log("User ["+objauth.username+"] creating "+resourceStr);
-
-	_cb({error:false});
+_exports.GetTopicInfo = function(topic, _cb/*_err,topic*/) {
+  // null or {insertDate: ..., id:...};
+  sql_client.query('SELECT * FROM messages.TOPICS where DENUMIRE = ?',[topic],function (err,results,fields) {
+    if (err) { _cb(err); return; }
+    if (typeof(results)!='undefined' && results.length!=0) {
+      _cb(null,{insertDate:results[0].INSERTDATE, id: results[0].idTOPICS});
+    }
+    else {
+      _cb(null,null);
+    }
+  });
 }
 
-_exports.deleteResource=function(objauth,resourceStr,_cb/*response*/)
-{
-	console.log("User ["+objauth.username+"] deleting "+resourceStr);
+_exports.GetFullTopicInfo = function(topic, _cb/*_err,topic*/) {
+  // null or {insertDate: ..., resources: [ 'asd', ...] };
+  _cb(null,null);
+}
 
-	_cb({error:false});
+_exports.AddTopic = function(topic, _cb/*_err*/) {
+  sql_client.query('INSERT INTO messages.TOPICS SET INSERTDATE=NOW(), DENUMIRE = ?',[topic], function(err, result) {
+    if (err) 
+      _cb(err);
+    else
+      _cb(null);
+  });
+}
+
+_exports.DeleteTopic = function(topic, _cb/*_err*/) {
+  sql_client.query('DELETE FROM messages.TOPICS WHERE DENUMIRE = ?', [topic], function(err, result) {
+    if (err) 
+      _cb(err);
+    else
+      _cb(null);
+  });
+}
+
+_exports.GetResourceInfo = function(topic, resource, _cb/*_err,resource*/) {
+  //null or { lastModified: ..., content: ..., id: }
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('SELECT * FROM messages.MESSAGES where FK_ID_TOPIC = ? AND DENUMIRE = ?',[topicInfo.id, resource],function (err,results,fields) {
+      if (err) { _cb(err); return; }
+      if (typeof(results)!='undefined' && results.length!=0) {
+        _cb(null,{lastModified:results[0].LASTMODIFIED, content: results[0].DESCRIERE, id: results[0].idNOTIFICATIONS});
+      }
+      else {
+        _cb(null,null);
+      }
+    });
+  });
+}
+
+_exports.AddResource = function(topic, resource, content, _cb/*_err*/) {
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('INSERT INTO messages.MESSAGES SET DENUMIRE = ?, DESCRIERE = ?, FK_ID_TOPIC = ?, LASTMODIFIED = NOW()',[resource, content, topicInfo.id], function(err, result) {
+      if (err) 
+        _cb(err);
+      else
+        _cb(null);
+    });
+  });;
+}
+
+_exports.UpdateResource = function(topic, resource, content, _cb/*_err*/) {
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('UPDATE messages.MESSAGES SET DESCRIERE = ?, LASTMODIFIED = NOW() WHERE FK_ID_TOPIC = ? AND DENUMIRE = ?',[content, topicInfo.id, resource], function(err, result) {
+      if (err) 
+        _cb(err);
+      else
+        _cb(null);
+    });
+  });;
+}
+
+_exports.DeleteResource = function(topic, resource, content, _cb/*_err*/) {
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('DELETE FROM messages.MESSAGES WHERE FK_ID_TOPIC = ? AND DENUMIRE = ?', [topicInfo.id, resource], function(err, result) {
+      if (err) 
+        _cb(err);
+      else
+        _cb(null);
+    });
+  });
+}
+
+_exports.GetNotificationInfo = function (topic, user, _cb/*_err, notif*/) {
+  _cb('not implemented');
+}
+
+_exports.AddNotification = function (topic, user, _cb/*_err*/) {
+  _cb('not implemented');
+}
+
+_exports.DeleteNotification = function (topic, user, _cb/*_err*/) {
+  _cb('not implemented');
 }
 
 
