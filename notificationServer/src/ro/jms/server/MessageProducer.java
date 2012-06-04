@@ -1,8 +1,10 @@
 package ro.jms.server;
 
 
+import ro.jms.model.Notification;
 import ro.jms.utils.ConnParams;
 import ro.jms.utils.JMSUtils;
+import ro.jms.utils.dbAcces.NotificationsUtils;
 
 import javax.jms.*;
 import javax.naming.Context;
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.Override;
+import java.util.List;
 
 /**
  * Date: 6/2/12
@@ -76,48 +79,32 @@ public class MessageProducer extends HttpServlet {
             System.exit(1);
         }
 
-
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-//        Connection connection = null;
-//        javax.jms.MessageProducer producer = null;
-//        final int NUM_MSGS = 5;
-//        try {
-//            connection = connectionFactory.createConnection();
-//            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-//            producer = session.createProducer(dest);
-//            TextMessage message = session.createTextMessage();
-//
-//            for (int i = 0; i < NUM_MSGS; i++) {
-//                message.setText("This is message from Testing DEMO " + (i + 2));
-//                System.out.println("Sending message: " + message.getText());
-//                producer.send(message);
-//            }
-//
-//            producer.send(session.createMessage());
-//        } catch (JMSException e) {
-//            System.out.println("Exception occurred: " + e.toString());
-//        } finally {
-//            if (connection != null) {
-//                try {
-//                    connection.close();
-//                } catch (JMSException e) {
-//                }
-//            }
-//        }
         try {
             topicConnection = topicConnectionFactory.createTopicConnection();
             topicSession =
                     topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
             topicPublisher = topicSession.createPublisher(topic);
-            message = topicSession.createMapMessage();
 
-            for (int i = 0; i < NUMBER_OF_MESSAGES; i++) {
-                message = JMSUtils.createMessage(message, ConnParams.jmsProviderHost, ConnParams.jmsProviderHost, ConnParams.resourceJNDIName);
-                //publish the message in topic
-                topicPublisher.publish(message);
+            boolean loop = true;
+            while (loop) {
+                try {
+//                    Thread.sleep(20000);
+
+                    List<Notification> list = NotificationsUtils.getTopicMsgToSend();
+
+                    if (list != null || list.size() > 0) {
+                        for (Notification notification : list) {
+                            message = topicSession.createMapMessage();
+                            message = JMSUtils.createMessage(message, notification);
+                            //publish the message in topic
+                            topicPublisher.publish(message);
+                        }
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    loop = false;
+                }
+                loop = false;
             }
 
         } catch (JMSException ex) {
@@ -133,5 +120,9 @@ public class MessageProducer extends HttpServlet {
         }
 
 
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
     }
 }

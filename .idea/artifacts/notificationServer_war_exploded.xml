@@ -1,14 +1,18 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="notificationServer:war exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/notificationServer_war_exploded</output-path>
+    <output-path>$PROJECT_DIR$/notificationServer/target/NotificationServer-1.0-SNAPSHOT</output-path>
     <root id="root">
+      <element id="javaee-facet-resources" facet="notificationServer/web/Web" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="notificationServer" />
         </element>
-        <element id="file-copy" path="$PROJECT_DIR$/notificationServer/web/WEB-INF/web.xml" />
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: javax:javaee-api:6.0" />
+          <element id="library" level="project" name="Maven: log4j:log4j:1.2.16" />
+          <element id="library" level="project" name="Maven: mysql:mysql-connector-java:5.1.20" />
+        </element>
       </element>
-      <element id="javaee-facet-resources" facet="notificationServer/web/Web" />
     </root>
   </artifact>
 </component>

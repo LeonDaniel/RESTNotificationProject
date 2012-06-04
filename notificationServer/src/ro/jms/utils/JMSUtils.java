@@ -1,5 +1,7 @@
 package ro.jms.utils;
 
+import ro.jms.model.Notification;
+
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.naming.Context;
@@ -28,22 +30,14 @@ public class JMSUtils {
     }
     
 
-    public static MapMessage createMessage(MapMessage message, String from, String to, String topicName) throws JMSException{
-        message.setStringProperty("from", "from@" + from);
-        message.setStringProperty("to", "to@" + to);
-        message.setStringProperty("subject",
-                "Topic Message ");
-        message.setStringProperty("content",
-                "Message - " + " in Topic: \"" +
-                        topicName + "\"");
-        System.out.println("Publishing message: " +
-                message.getStringProperty("from"));
-        System.out.println("Publishing message: " +
-                message.getStringProperty("to"));
-        System.out.println("Publishing message: " +
-                message.getStringProperty("subject"));
-        System.out.println("Publishing message: " +
-                message.getStringProperty("content"));
+    public static MapMessage createMessage(MapMessage message, Notification notification) throws JMSException{
+        message.setStringProperty("from", "from@" + "JMS Server");
+        message.setStringProperty("to", "to@" + notification.getUserName());
+        message.setStringProperty("subject", "Topic Message");
+        message.setStringProperty("content",notification.getMessageContext());
+        message.setStringProperty("topic",notification.getTopicName());
+        message.setStringProperty("resourceInfo",notification.getResourceInfo());
+
         
         return message;
     }

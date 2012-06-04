@@ -1,10 +1,13 @@
 package ro.jms.utils.dbUtils;
 
+import ro.jms.model.Notification;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,12 +15,12 @@ import java.util.List;
  * Date: 6/3/12
  * Email: hunealucian@gmail.com
  */
-public class MessagesJVMDAO {
+public class MessagesJMSDAO {
     Connection con = null;
     PreparedStatement ptmt = null;
     ResultSet rs = null;
 
-    public MessagesJVMDAO() {
+    public MessagesJMSDAO() {
     }
 
     private Connection getConnection() throws SQLException {
@@ -122,23 +125,46 @@ public class MessagesJVMDAO {
 
     }
 
-    public List findAll() {
-        List employees = new ArrayList();
-//        EmployeeBean employeeBean = null;
+    public List findAll(String status) {
+        List<Notification> result = new LinkedList<Notification>();
+        Notification notif = null;
         try {
-            String querystring ="SELECT * FROM EMPLOYEE";
+            String querystring ="SELECT \n" +
+                    " n.IDNOTIFICATIONS as IDNOTIF,\n" +
+                    " t.DENUMIRE as DENTOPIC,\n" +
+                    " u.idUSERS as IDUSER,\n" +
+                    " u.USERNAME as USERNAME,\n" +
+                    " msg.DESCRIERE as MSGDESC,\n" +
+                    " n.RESOURCE_INFO as RESOURCE_INFO\n" +
+                    "FROM messages.NOTIFICATIONS n\n" +
+                    " LEFT JOIN messages.TOPICS t ON (t.idTOPICS = n.FK_ID_TOPIC)\n" +
+                    " LEFT JOIN messages.USERS u ON (u.idUSERS = n.FK_ID_USER)\n" +
+                    " INNER JOIN \n" +
+                    "  (\n" +
+                    "    select m.DESCRIERE as DESCRIERE, m.FK_ID_TOPIC as FK_ID_TOPIC from messages.MESSAGES m \n" +
+                    "        ORDER BY m.LASTMODIFIED LIMIT 2\n" +
+                    "  ) msg ON (msg.FK_ID_TOPIC = n.FK_ID_TOPIC)\n" +
+                    "WHERE 0=0 ";
+
+            if( status.length() > 0 ){
+                querystring.replace("{0}", "AND m.STATUS='pending'");
+            } else {
+                querystring.replace("{0}", " ");
+            }
+
             con = getConnection();
             ptmt = con.prepareStatement(querystring);
             rs = ptmt.executeQuery();
             while (rs.next()) {
-//                employeeBean = new EmployeeBean();
-//                employeeBean.setEmpId(rs.getString(1));
-//                employeeBean.setEmpName(rs.getString(2));
-//                employeeBean.setEmpAddr(rs.getString(3));
-//                employeeBean.setEmpEmail(rs.getString(4));
-//                employeeBean.setEmpPhone(rs.getString(5));
-//
-//                employees.add(employeeBean);
+                notif = new Notification();
+                notif.setId(Integer.parseInt(rs.getString("IDNOTIF")));
+                notif.setFk_id_user(Integer.parseInt(rs.getString("IDUSER")));
+                notif.setUserName(rs.getString("USERNAME"));
+                notif.setTopicName(rs.getString("DENTOPIC"));
+                notif.setMessageContext(rs.getString("MSGDESC"));
+                notif.setResourceInfo(rs.getString("RESOURCE_INFO"));
+
+                result.add(notif);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,7 +183,7 @@ public class MessagesJVMDAO {
             }
 
         }
-        return employees;
+        return result;
     }
 
 //    public EmployeeBean findByPrimaryKey(String empId) {
