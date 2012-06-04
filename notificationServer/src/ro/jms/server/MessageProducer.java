@@ -25,17 +25,9 @@ import java.util.List;
  */
 
 public class MessageProducer extends HttpServlet {
-    //    private Context jndiContext;
-    private ConnectionFactory connectionFactory;
-    private String resourceJNDIName = "jms/TopicResource";
-    private String connectionFactoryJNDIName = "jms/TopicConnectionFactoryServer";
-    private Destination dest;
-
-    ////////////////////
-    final int NUMBER_OF_MESSAGES = 5;
+    Context jndiContext = null;                             // jndi context
     TopicConnection topicConnection = null;                 // topic connection ?
     TopicConnectionFactory topicConnectionFactory = null;   // connection factory
-    Context jndiContext = null;                             // jndi context
     TopicSession topicSession = null;                       // topic session
     Topic topic = null;                                     // za topic
     TopicPublisher topicPublisher = null;                   // topic publisher
@@ -43,28 +35,6 @@ public class MessageProducer extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-//        super.init();
-//        jndiContext = null;
-//
-//        try {
-//            jndiContext = new InitialContext();
-//        } catch (NamingException e) {
-//            System.out.println("Could not create JNDI API context: " + e.toString());
-//            System.exit(1);
-//        }
-//
-//        connectionFactory = null;
-//        dest = null;
-//
-//        try {
-//            connectionFactory = (ConnectionFactory) jndiContext.lookup(connectionFactoryJNDIName);
-//            dest = (Destination) jndiContext.lookup(resourceJNDIName);
-//        } catch (Exception e) {
-//            System.out.println("JNDI API lookup failed: " + e.toString());
-//            e.printStackTrace();
-//            System.exit(1);
-//        }
-
         jndiContext = JMSUtils.setUpJNDIContext(jndiContext);
 
         /*
@@ -79,32 +49,28 @@ public class MessageProducer extends HttpServlet {
             System.exit(1);
         }
 
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         try {
             topicConnection = topicConnectionFactory.createTopicConnection();
-            topicSession =
-                    topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+            topicSession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
             topicPublisher = topicSession.createPublisher(topic);
 
-            boolean loop = true;
-            while (loop) {
-                try {
-//                    Thread.sleep(20000);
+            try {
+                List<Notification> list = NotificationsUtils.getTopicMsgToSend();
 
-                    List<Notification> list = NotificationsUtils.getTopicMsgToSend();
-
-                    if (list != null || list.size() > 0) {
-                        for (Notification notification : list) {
-                            message = topicSession.createMapMessage();
-                            message = JMSUtils.createMessage(message, notification);
-                            //publish the message in topic
-                            topicPublisher.publish(message);
-                        }
+                if (list != null || list.size() > 0) {
+                    for (Notification notification : list) {
+                        message = topicSession.createMapMessage();
+                        message = JMSUtils.createMessage(message, notification);
+                        //publish the message in topic
+                        topicPublisher.publish(message);
                     }
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    loop = false;
                 }
-                loop = false;
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
 
         } catch (JMSException ex) {
@@ -120,9 +86,5 @@ public class MessageProducer extends HttpServlet {
         }
 
 
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
     }
 }

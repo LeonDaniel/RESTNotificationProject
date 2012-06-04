@@ -5,12 +5,11 @@
 		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
            version="2.5">
 
-    <display-name>Server</display-name>
+    <display-name>JMS Server</display-name>
 
     <servlet>
         <servlet-name>Producer</servlet-name>
         <servlet-class>ro.jms.server.MessageProducer</servlet-class>
-        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>Producer</servlet-name>

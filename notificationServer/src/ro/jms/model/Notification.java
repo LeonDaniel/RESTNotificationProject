@@ -7,9 +7,10 @@ package ro.jms.model;
  */
 public class Notification {
     private int id = -1;
-    private int fk_id_user;
+    private int id_user;
+    private int id_topic;
+    private int id_msg;
     private String userName;
-    private String resourceInfo;
     private String topicName;
     private String messageContext;
     private String status;
@@ -25,12 +26,12 @@ public class Notification {
         this.id = id;
     }
 
-    public int getFk_id_user() {
-        return fk_id_user;
+    public int getId_user() {
+        return id_user;
     }
 
-    public void setFk_id_user(int fk_id_user) {
-        this.fk_id_user = fk_id_user;
+    public void setId_user(int id_user) {
+        this.id_user = id_user;
     }
 
     public String getUserName() {
@@ -39,14 +40,6 @@ public class Notification {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getResourceInfo() {
-        return resourceInfo;
-    }
-
-    public void setResourceInfo(String resourceInfo) {
-        this.resourceInfo = resourceInfo;
     }
 
     public String getTopicName() {
@@ -71,5 +64,21 @@ public class Notification {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getId_topic() {
+        return id_topic;
+    }
+
+    public void setId_topic(int id_topic) {
+        this.id_topic = id_topic;
+    }
+
+    public int getId_msg() {
+        return id_msg;
+    }
+
+    public void setId_msg(int id_msg) {
+        this.id_msg = id_msg;
     }
 }

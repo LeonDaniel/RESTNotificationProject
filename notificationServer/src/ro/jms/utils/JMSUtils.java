@@ -32,13 +32,14 @@ public class JMSUtils {
 
     public static MapMessage createMessage(MapMessage message, Notification notification) throws JMSException{
         message.setStringProperty("from", "from@" + "JMS Server");
-        message.setStringProperty("to", "to@" + notification.getUserName());
+        message.setStringProperty("to", notification.getUserName());
+        message.setStringProperty("toID", String.valueOf(notification.getId_user()));
         message.setStringProperty("subject", "Topic Message");
         message.setStringProperty("content",notification.getMessageContext());
+        message.setStringProperty("contentID", String.valueOf(notification.getId_msg()));
         message.setStringProperty("topic",notification.getTopicName());
-        message.setStringProperty("resourceInfo",notification.getResourceInfo());
+        message.setStringProperty("topicID", String.valueOf(notification.getId_topic()));
 
-        
         return message;
     }
 }
