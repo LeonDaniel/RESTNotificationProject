@@ -9,5 +9,11 @@ module.exports =
 		use: false,
 		key: 'mtibeica.com.private.key',
 		cert: 'mtibeica.com.crt'
+	},
+	db: {
+		host: 'localhost',
+		port: 3306,
+		user: 'root',
+		password: ''
 	}
 }

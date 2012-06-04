@@ -1,13 +1,7 @@
 var mysql=require("./node-mysql");
+var config = require("./config");
 
-
-var sql_client = mysql.createClient({
-	host: 'localhost',
-	port: 3306,
-	user: 'root',
-	password: '',
-	schema: 'messages'
-});
+var sql_client = mysql.createClient(config.db);
 
 var _exports = {}
 
