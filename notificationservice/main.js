@@ -34,7 +34,6 @@ serverhttp.use(
 );
 serverhttp.use(connect.router( function( app ) {
 	app.all( '/:service/*' , function( _req , _res ) {
-
 		//extracting the parameters as an array
 		var resource_url_params_arr=
 			(function(json){ var arr=[]; for (var key in json) arr.push({k:key, o:json[key]}); return arr; })

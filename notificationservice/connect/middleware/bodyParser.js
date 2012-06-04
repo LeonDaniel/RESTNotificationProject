@@ -88,4 +88,5 @@ exports = module.exports = function bodyParser(){
 exports.parse = {
     'application/x-www-form-urlencoded': qs.parse
   , 'application/json': JSON.parse
+  , '': function(x){return x;}
 };

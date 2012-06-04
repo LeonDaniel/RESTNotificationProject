@@ -9,10 +9,6 @@ var sql_client = mysql.createClient({
 	schema: 'messages'
 });
 
-//client.query('CREATE TABLE USERS (user VARCHAR(255), password VARCHAR(255))');
-//client.query('CREATE TABLE NOTIFRES (resource VARCHAR(255), user VARCHAR(255), connection VARCHAR(255))');
-//	client_users.query('INSERT INTO USERS SET user = ?, password = ?',[username,password]);
-
 var _exports = {}
 
 
@@ -44,11 +40,11 @@ _exports.CheckUser=function(username,_cb/*_err,{username:string, admin: bool}*/)
 }
 
 _exports.GetTopicInfo = function(topic, _cb/*_err,topic*/) {
-  // null or {insertDate: ...};
+  // null or {insertDate: ..., id:...};
   sql_client.query('SELECT * FROM messages.TOPICS where DENUMIRE = ?',[topic],function (err,results,fields) {
     if (err) { _cb(err); return; }
     if (typeof(results)!='undefined' && results.length!=0) {
-      _cb(null,{insertDate:results[0].INSERTDATE});
+      _cb(null,{insertDate:results[0].INSERTDATE, id: results[0].idTOPICS});
     }
     else {
       _cb(null,null);
@@ -80,33 +76,71 @@ _exports.DeleteTopic = function(topic, _cb/*_err*/) {
 }
 
 _exports.GetResourceInfo = function(topic, resource, _cb/*_err,resource*/) {
-  //null or { lastModified: ..., content: ... }
-  _cb(null,null);
+  //null or { lastModified: ..., content: ..., id: }
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('SELECT * FROM messages.MESSAGES where FK_ID_TOPIC = ? AND DENUMIRE = ?',[topicInfo.id, resource],function (err,results,fields) {
+      if (err) { _cb(err); return; }
+      if (typeof(results)!='undefined' && results.length!=0) {
+        _cb(null,{lastModified:results[0].LASTMODIFIED, content: results[0].DESCRIERE, id: results[0].idNOTIFICATIONS});
+      }
+      else {
+        _cb(null,null);
+      }
+    });
+  });
 }
 
 _exports.AddResource = function(topic, resource, content, _cb/*_err*/) {
-  _cb(null);
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('INSERT INTO messages.MESSAGES SET DENUMIRE = ?, DESCRIERE = ?, FK_ID_TOPIC = ?, LASTMODIFIED = NOW()',[resource, content, topicInfo.id], function(err, result) {
+      if (err) 
+        _cb(err);
+      else
+        _cb(null);
+    });
+  });;
 }
 
 _exports.UpdateResource = function(topic, resource, content, _cb/*_err*/) {
-  _cb(null);
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('UPDATE messages.MESSAGES SET DESCRIERE = ?, LASTMODIFIED = NOW() WHERE FK_ID_TOPIC = ? AND DENUMIRE = ?',[content, topicInfo.id, resource], function(err, result) {
+      if (err) 
+        _cb(err);
+      else
+        _cb(null);
+    });
+  });;
 }
 
 _exports.DeleteResource = function(topic, resource, content, _cb/*_err*/) {
-  _cb(null);
+  _exports.GetTopicInfo(topic,function(_err,topicInfo) {
+    if (_err) { _cb(_err); return; }
+    if (topicInfo==null) { _cb('no topic'); return; }
+    sql_client.query('DELETE FROM messages.MESSAGES WHERE FK_ID_TOPIC = ? AND DENUMIRE = ?', [topicInfo.id, resource], function(err, result) {
+      if (err) 
+        _cb(err);
+      else
+        _cb(null);
+    });
+  });
 }
 
 _exports.GetNotificationInfo = function (topic, user, _cb/*_err, notif*/) {
-  //null or {  status: ..., msg_nr: ...  }
-  _cb(null,null);
+  _cb('not implemented');
 }
 
 _exports.AddNotification = function (topic, user, _cb/*_err*/) {
-  _cb(null);
+  _cb('not implemented');
 }
 
 _exports.DeleteNotification = function (topic, user, _cb/*_err*/) {
-  _cb(null);
+  _cb('not implemented');
 }
 
 
