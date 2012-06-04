@@ -19,11 +19,14 @@ public class JMSTopicMapListener implements MessageListener {
             if (message instanceof MapMessage) {
                 msg = (MapMessage)message;
                 String from = msg.getStringProperty("from");
-                String to = msg.getStringProperty("to"); //& user id
+                String to = msg.getStringProperty("to"); 
+                String userID = msg.getString("toID");
                 String subject = msg.getStringProperty("subject");
                 String content = msg.getStringProperty("content");
-                String topicName = msg.getStringProperty("topic"); //& topic id
-                //String resource = msg.getStringProperty("resourceInfo");
+                String msgID = msg.getStringProperty("contentID");
+                String topicName = msg.getStringProperty("topic");
+                String topicID = msg.getStringProperty("topicID");
+                
                 System.out.println("READING MESSAGE \n=============== \nFrom: " +
                         from + "\nTo: " + to + "\nSubject: " +
                         subject +
