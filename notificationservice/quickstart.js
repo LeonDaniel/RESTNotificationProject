@@ -32,15 +32,11 @@ function Request(method, path, user, password, data, _cb)
   req.end();
 }
 
+Request('POST','/TOPIC/general/interest/topic','marius','bad pwd','',function(resp){ console.log('Creating a topic with wrong password: '+resp);
 Request('POST','/TOPIC/general/interest/topic','marius','marius','',function(resp){ console.log('Creating a topic: '+resp);
 Request('POST','/MESSAGE/general/interest/topic?data=1','marius','marius','firstmessage',function(resp){ console.log('Creating a message: '+resp);
 Request('PUT','/MESSAGE/general/interest/topic?data=1','marius','marius','firstmessage modified',function(resp){ console.log('Modifying a message: '+resp);
 Request('POST','/NOTIFICATION/general/interest/topic?user=daniel','marius','marius','',function(resp){ console.log('Subscribing daniel: '+resp);
 Request('GET','/NOTIFICATION/general/interest/topic','daniel','daniel',null,function(resp){ console.log('Checking daniels notification info: '+resp);
 Request('DELETE','/TOPIC/general/interest/topic','marius','marius','',function(resp){ console.log('Removing topic: '+resp);
-});
-});
-});
-});
-});
-});
+});});});});});});});
