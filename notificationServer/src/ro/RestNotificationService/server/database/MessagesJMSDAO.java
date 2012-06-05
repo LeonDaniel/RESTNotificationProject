@@ -45,12 +45,13 @@ public class MessagesJMSDAO {
                     " LEFT JOIN messages.USERS u ON (u.idUSERS = n.FK_ID_USER AND u.STATUS='online')\n" +
                     " INNER JOIN \n" +
                     "  (\n" +
-                    "    select m.DESCRIERE as DESCRIERE, m.FK_ID_TOPIC as FK_ID_TOPIC from messages.MESSAGES m \n" +
+                    "    select m.DESCRIERE as DESCRIERE, m.idMESSAGES as idMESSAGES,m.FK_ID_TOPIC from messages.MESSAGES m \n" +
                     "        ORDER BY m.LASTMODIFIED LIMIT 2\n" +
                     "  ) msg ON (msg.FK_ID_TOPIC = n.FK_ID_TOPIC)\n" +
                     "WHERE 0=0 ";
 
 
+            System.out.println(querystring);
             con = getConnection();
             ptmt = con.prepareStatement(querystring);
             rs = ptmt.executeQuery();

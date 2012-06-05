@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="notificationServer:war">
-    <output-path>$PROJECT_DIR$/notificationServer/target</output-path>
-    <root id="archive" name="NotificationServer-1.0-SNAPSHOT.war">
-      <element id="artifact" artifact-name="notificationServer:war exploded" />
-    </root>
-  </artifact>
-</component>
