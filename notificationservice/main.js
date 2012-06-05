@@ -224,9 +224,7 @@ function ProcessNotification(method, topic, resourceName, resourceContent, userI
             if (notif!=null) { _cb({ error: true, error_string: 'User is already subscribed' }); return; }
             dblayer.AddNotification(topic, notificationUser, messagesNumber, function (_err) {
               if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
-              dblayer.GetNotificationInfo(topic, notificationUser, function (_err,notif) {
-                CallEvent('onCreateNotification','idUser='+notif.id);
-              }
+              CallEvent('onCreateNotification','idUser='+usrInf.id+'&idTopic='+topicInfo.id);
               _cb({ error:false}); return;
             });
           });
@@ -300,10 +298,11 @@ function CallEvent(evName,params) {
     return;
   var sendPath=config.events[evName].path;
   if (params) sendPath+='?'+params;
+  console.log('calling: '+sendPath);
   var options = {
     host: config.events[evName].host,
     port: config.events[evName].port,
-    path: config.events[evName].path,
+    path: sendPath,
     method: 'GET',
   };
   var req = http.request(options, function(res) {
@@ -312,7 +311,7 @@ function CallEvent(evName,params) {
       response_str += chunk;
     });
     res.on('end', function() {
-      _cb(response_str);
+      console.log(response_str);
     })
   });
   //req.write(data);

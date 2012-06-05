@@ -17,16 +17,16 @@ module.exports =
 	},
 	events: {
 		onCreateNotification: {
-			active: false,
+			active: true,
 			host: 'localhost',
-			port: 80,
-			path: '/subscribe'
+			port: 8080,
+			path: '/jmsServer/subscribe'
 		},
 		onMessage: {
-			active: false,
+			active: true,
 			host: 'localhost',
-			port: 80,
-			path: '/newMessage'
+			port: 8080,
+			path: '/jmsServer/newMessage'
 		}
 	}
 }
