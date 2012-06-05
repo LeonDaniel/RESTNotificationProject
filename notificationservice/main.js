@@ -149,7 +149,7 @@ function ProcessMessage(method, topic, resourceName, resourceContent, userInfo, 
 
             dblayer.GetResourceInfo(topic, resourceName, function (_err, resource) {
               CallEvent('onMessage','idMessage='+resource.id);
-            }
+            });
 
             if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
             _cb({ error:false }); return;
@@ -290,6 +290,7 @@ function IsAdmin(userInfo) {
 }
 
 function CallEvent(evName,params) {
+
   if (!config.events[evName].active)
     return;
   var sendPath=config.events[evName].path;

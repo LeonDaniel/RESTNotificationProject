@@ -2,7 +2,7 @@ var os = require ( 'os' );
 
 module.exports = 
 {
-	host: '172.21.36.46',
+	host: 'localhost',
 	port: 1337,
 	https: {
 		use: false,
@@ -13,17 +13,17 @@ module.exports =
 		host: 'localhost',
 		port: 3306,
 		user: 'root',
-		password: 'root'
+		password: 'admin'
 	},
 	events: {
 		onCreateNotification: {
-			active: true,
+			active: false,
 			host: 'localhost',
 			port: 80,
 			path: '/ping'
 		},
 		onMessage: {
-			active:true,
+			active: false,
 			host: 'localhost',
 			port: 80,
 			path: '/newMessage'
