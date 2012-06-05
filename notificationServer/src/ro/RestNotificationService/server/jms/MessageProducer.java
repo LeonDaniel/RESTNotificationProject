@@ -23,25 +23,19 @@ import java.util.List;
  */
 
 public class MessageProducer extends HttpServlet {
-    Context jndiContext = null;                             // jndi context
-    TopicConnection topicConnection = null;                 // topic connection ?
-    TopicConnectionFactory topicConnectionFactory = null;   // connection factory
-    TopicSession topicSession = null;                       // topic session
-    Topic topic = null;                                     // za topic
-    TopicPublisher topicPublisher = null;                   // topic publisher
-    MapMessage message = null;
+
 
     @Override
     public void init() throws ServletException {
-        jndiContext = JMSUtils.setUpJNDIContext(jndiContext);
+        JMSUtils.setUpJNDIContext();
 
         /*
         * Lookup the Topic Connection Factory.
         * Lookup the JMS Destination.
         */
         try {
-            topicConnectionFactory = (TopicConnectionFactory) jndiContext.lookup(ConnParams.connectionFactoryJNDIName);
-            topic = (Topic) jndiContext.lookup(ConnParams.resourceJNDIName);
+            JMSUtils.topicConnectionFactory= (TopicConnectionFactory) JMSUtils.jndiContext.lookup(ConnParams.connectionFactoryJNDIName);
+            JMSUtils.topic = (Topic) JMSUtils.jndiContext.lookup(ConnParams.resourceJNDIName);
         } catch (NamingException e) {
             System.out.println("Lookup failed: " + e.toString());
             System.exit(1);
@@ -51,37 +45,6 @@ public class MessageProducer extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-        try {
-            topicConnection = topicConnectionFactory.createTopicConnection();
-            topicSession = topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-            topicPublisher = topicSession.createPublisher(topic);
-
-            try {
-                List<Notification> list = NotificationsUtils.getTopicMsgToSend();
-
-                if (list != null || list.size() > 0) {
-                    for (Notification notification : list) {
-                        message = topicSession.createMapMessage();
-                        message = JMSUtils.createMessage(message, notification);
-                        //publish the message in topic
-                        topicPublisher.publish(message);
-                    }
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-
-        } catch (JMSException ex) {
-            System.out.println("Exception occurred: " + ex.toString());
-        } finally {
-            if (topicConnection != null) {
-                try {
-                    topicConnection.close();
-                } catch (JMSException e) {
-                    System.out.println("Closing error: " + e.toString());
-                }
-            }
-        }
 
 
     }

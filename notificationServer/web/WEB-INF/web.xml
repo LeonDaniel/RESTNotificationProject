@@ -10,6 +10,7 @@
     <servlet>
         <servlet-name>Producer</servlet-name>
         <servlet-class>ro.RestNotificationService.server.jms.MessageProducer</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>Producer</servlet-name>
