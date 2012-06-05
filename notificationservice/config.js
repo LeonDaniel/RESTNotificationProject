@@ -20,7 +20,7 @@ module.exports =
 			active: false,
 			host: 'localhost',
 			port: 80,
-			path: '/ping'
+			path: '/subscribe'
 		},
 		onMessage: {
 			active: false,

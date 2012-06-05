@@ -177,6 +177,9 @@ function ProcessMessage(method, topic, resourceName, resourceContent, userInfo, 
           if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
           if (resource == null) { _cb({ error: true, error_string: 'Resource does not exist' }); return; }
           dblayer.UpdateResource(topic, resourceName, resourceContent, function (_err) {
+            dblayer.GetResourceInfo(topic, resourceName, function (_err, resource) {
+              CallEvent('onMessage','idMessage='+resource.id);
+            });
             if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
             _cb({ error:false }); return;
           });
@@ -221,7 +224,9 @@ function ProcessNotification(method, topic, resourceName, resourceContent, userI
             if (notif!=null) { _cb({ error: true, error_string: 'User is already subscribed' }); return; }
             dblayer.AddNotification(topic, notificationUser, messagesNumber, function (_err) {
               if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
-              CallEvent('onCreateNotification');
+              dblayer.GetNotificationInfo(topic, notificationUser, function (_err,notif) {
+                CallEvent('onCreateNotification','idUser='+notif.id);
+              }
               _cb({ error:false}); return;
             });
           });
