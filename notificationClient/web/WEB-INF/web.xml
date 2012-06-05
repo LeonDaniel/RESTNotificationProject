@@ -7,9 +7,21 @@
 
     <display-name>Client</display-name>
 
+    <!-- Just here so the JSF implementation can initialize, *not* used at runtime -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Just here so the JSF implementation can initialize -->
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>Consumer</servlet-name>
-        <servlet-class>ro.jms.client.MessageReceiver</servlet-class>
+        <servlet-class>ro.RestNotificationService.client.jms.MessageReceiver</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Consumer</servlet-name>
@@ -18,7 +30,10 @@
 
     <listener>
         <description>sessionListener</description>
-        <listener-class>ro.jms.client.listeners.HttpSessionListener</listener-class>
+        <listener-class>ro.RestNotificationService.client.session.HttpSessionListener</listener-class>
     </listener>
 
+    <welcome-file-list>
+        <welcome-file>/main.xhtml</welcome-file>
+    </welcome-file-list>
 </web-app>
