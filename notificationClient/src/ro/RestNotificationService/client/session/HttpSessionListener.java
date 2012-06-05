@@ -1,7 +1,7 @@
-package ro.jms.client.listeners;
+package ro.RestNotificationService.client.session;
 
-import ro.jms.client.dbUtils.UserDAO;
-import ro.jms.client.model.User;
+import ro.RestNotificationService.client.database.UserDAO;
+import ro.RestNotificationService.client.model.User;
 
 import javax.servlet.http.HttpSessionEvent;
 

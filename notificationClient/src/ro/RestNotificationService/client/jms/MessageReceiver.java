@@ -1,4 +1,4 @@
-package ro.jms.client;
+package ro.RestNotificationService.client.jms;
 
 import javax.jms.*;
 import javax.naming.Context;

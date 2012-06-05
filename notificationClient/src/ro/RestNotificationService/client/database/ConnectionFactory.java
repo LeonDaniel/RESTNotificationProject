@@ -1,4 +1,4 @@
-package ro.jms.client.dbUtils;
+package ro.RestNotificationService.client.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

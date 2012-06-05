@@ -21,7 +21,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>Consumer</servlet-name>
-        <servlet-class>ro.jms.client.MessageReceiver</servlet-class>
+        <servlet-class>ro.RestNotificationService.client.jms.MessageReceiver</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Consumer</servlet-name>
@@ -30,7 +30,7 @@
 
     <listener>
         <description>sessionListener</description>
-        <listener-class>ro.jms.client.listeners.HttpSessionListener</listener-class>
+        <listener-class>ro.RestNotificationService.client.session.HttpSessionListener</listener-class>
     </listener>
 
     <welcome-file-list>

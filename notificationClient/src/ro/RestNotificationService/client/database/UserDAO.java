@@ -1,6 +1,6 @@
-package ro.jms.client.dbUtils;
+package ro.RestNotificationService.client.database;
 
-import ro.jms.client.model.User;
+import ro.RestNotificationService.client.model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

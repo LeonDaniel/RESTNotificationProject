@@ -1,4 +1,4 @@
-package ro.jms.client.model;
+package ro.RestNotificationService.client.model;
 
 /**
  * Created by luc
