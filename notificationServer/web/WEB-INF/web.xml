@@ -16,4 +16,31 @@
         <url-pattern>/produce</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>NewMessage</servlet-name>
+        <servlet-class>ro.RestNotificationService.server.jms.servlets.NewMessageServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewMessage</servlet-name>
+        <url-pattern>/newMessage</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Subscribe</servlet-name>
+        <servlet-class>ro.RestNotificationService.server.jms.servlets.SubscribeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Subscribe</servlet-name>
+        <url-pattern>/subscribe</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OnlineNotifier</servlet-name>
+        <servlet-class>ro.RestNotificationService.server.jms.servlets.OnlineNotifierServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OnlineNotifier</servlet-name>
+        <url-pattern>/loginNotifier</url-pattern>
+    </servlet-mapping>
+
 </web-app>
