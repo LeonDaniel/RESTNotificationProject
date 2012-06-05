@@ -2,10 +2,9 @@ var os = require ( 'os' );
 
 module.exports = 
 {
-	host: '192.168.1.102',
-	port: 80,
-	https: 
-	{
+	host: '172.21.36.46',
+	port: 1337,
+	https: {
 		use: false,
 		key: 'mtibeica.com.private.key',
 		cert: 'mtibeica.com.crt'
@@ -14,6 +13,14 @@ module.exports =
 		host: 'localhost',
 		port: 3306,
 		user: 'root',
-		password: ''
+		password: 'root'
+	},
+	events: {
+		onCreateNotification: {
+			active: true,
+			host: '172.21.36.46',
+			port: 12345,
+			path: '/ping'
+		}
 	}
 }
