@@ -146,6 +146,11 @@ function ProcessMessage(method, topic, resourceName, resourceContent, userInfo, 
           if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
           if (resource != null) { _cb({ error: true, error_string: 'Existing resource' }); return; }
           dblayer.AddResource(topic, resourceName, resourceContent, function (_err) {
+
+            dblayer.GetResourceInfo(topic, resourceName, function (_err, resource) {
+              CallEvent('onMessage','idMessage='+resource.id);
+            }
+
             if (_err) { _cb({ error: true, error_string: 'DB Error: '+_err }); return; }
             _cb({ error:false }); return;
           });
@@ -284,9 +289,11 @@ function IsAdmin(userInfo) {
   return ('admin' in userInfo && userInfo.admin);
 }
 
-function CallEvent(evName) {
+function CallEvent(evName,params) {
   if (!config.events[evName].active)
     return;
+  var sendPath=config.events[evName].path;
+  if (params) sendPath+='?'+params;
   var options = {
     host: config.events[evName].host,
     port: config.events[evName].port,

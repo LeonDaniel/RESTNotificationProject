@@ -18,9 +18,15 @@ module.exports =
 	events: {
 		onCreateNotification: {
 			active: true,
-			host: '172.21.36.46',
-			port: 12345,
+			host: 'localhost',
+			port: 80,
 			path: '/ping'
+		},
+		onMessage: {
+			active:true,
+			host: 'localhost',
+			port: 80,
+			path: '/newMessage'
 		}
 	}
 }
