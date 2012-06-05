@@ -1,6 +1,6 @@
-package ro.jms.utils.dbUtils;
+package ro.RestNotificationService.server.database;
 
-import ro.jms.model.Notification;
+import ro.RestNotificationService.server.model.Notification;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

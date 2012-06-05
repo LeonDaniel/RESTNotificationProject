@@ -1,6 +1,6 @@
-package ro.jms.utils;
+package ro.RestNotificationService.server.jms;
 
-import ro.jms.model.Notification;
+import ro.RestNotificationService.server.model.Notification;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;

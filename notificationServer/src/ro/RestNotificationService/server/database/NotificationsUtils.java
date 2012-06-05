@@ -1,7 +1,6 @@
-package ro.jms.utils.dbAcces;
+package ro.RestNotificationService.server.database;
 
-import ro.jms.model.Notification;
-import ro.jms.utils.dbUtils.MessagesJMSDAO;
+import ro.RestNotificationService.server.model.Notification;
 
 import java.util.LinkedList;
 import java.util.List;

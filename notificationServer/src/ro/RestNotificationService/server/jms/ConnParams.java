@@ -1,4 +1,4 @@
-package ro.jms.utils;
+package ro.RestNotificationService.server.jms;
 
 /**
  * Created by luc

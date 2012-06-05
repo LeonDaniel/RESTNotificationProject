@@ -9,7 +9,7 @@
 
     <servlet>
         <servlet-name>Producer</servlet-name>
-        <servlet-class>ro.jms.server.MessageProducer</servlet-class>
+        <servlet-class>ro.RestNotificationService.server.jms.MessageProducer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Producer</servlet-name>

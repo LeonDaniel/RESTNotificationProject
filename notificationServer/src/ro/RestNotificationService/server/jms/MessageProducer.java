@@ -1,10 +1,8 @@
-package ro.jms.server;
+package ro.RestNotificationService.server.jms;
 
 
-import ro.jms.model.Notification;
-import ro.jms.utils.ConnParams;
-import ro.jms.utils.JMSUtils;
-import ro.jms.utils.dbAcces.NotificationsUtils;
+import ro.RestNotificationService.server.model.Notification;
+import ro.RestNotificationService.server.database.NotificationsUtils;
 
 import javax.jms.*;
 import javax.naming.Context;
