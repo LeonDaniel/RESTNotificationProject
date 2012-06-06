@@ -5,46 +5,17 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:a4j="http://richfaces.org/a4j"
       xmlns:rich="http://richfaces.org/rich">
 <h:head>
-    <title>Notification Appliation</title>
+    <title>Notification Application</title>
 </h:head>
 
 <h:body>
-    <h:outputText>Place your content here</h:outputText>
-    <a4j:outputPanel ajaxRendered="true">
-        <h:messages style="color:red" />
-    </a4j:outputPanel>
-    <h:panelGrid columns="2" columnClasses="outergridvalidationcolumn">
-
-        <h:form id="form1">
-            <h:panelGrid columns="2">
-                <h:outputText value="Name" />
-                <h:inputText value="#{userBean.name}">
-                    <a4j:ajax event="onkeyup" render="outname" />
-                </h:inputText>
-                <h:outputText value="Job" />
-                <h:inputText  required="true" id="job2" value="#{userBean.job}" />
-            </h:panelGrid>
-        </h:form>
-
-        <h:form id="form2">
-            <h:panelGrid columns="2">
-                <h:outputText value="Name" />
-                <a4j:region>
-                    <h:inputText value="#{userBean.name}">
-                        <a4j:ajax event="onkeyup" render="outname" />
-                    </h:inputText>
-                </a4j:region>
-                <h:outputText value="Job" />
-                <h:inputText   required="true"  id="job1"  value="#{userBean.job}" />
-            </h:panelGrid>
-        </h:form>
-
-    </h:panelGrid>
-    <h:outputText id="outname" style="font-weight:bold" value="Typed Name: #{userBean.name}" />
-    <br />
+    ceva nou
+    <h:outputText>ceva Mesaj initial</h:outputText>
+    <a4j:push address="TopicResource" ondataavailable="alert('got message')"/>
 </h:body>
 
 </html>

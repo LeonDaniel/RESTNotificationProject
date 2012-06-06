@@ -18,12 +18,12 @@ public class HttpSessionListener implements javax.servlet.http.HttpSessionListen
     @Override
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         //get user from session
-        User user = (User)httpSessionEvent.getSession().getAttribute("user");
+        /*User user = (User)httpSessionEvent.getSession().getAttribute("user");
 
         //update user status to 'offline'
         user.setStatus("offline");
 
         UserDAO userDAO = new UserDAO();
-        userDAO.updateStatus(user);
+        userDAO.updateStatus(user);*/
     }
 }

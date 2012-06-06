@@ -43,7 +43,7 @@ public class JMSUtils {
         message.setStringProperty("topic",notification.getTopicName());
         message.setStringProperty("topicID", String.valueOf(notification.getId_topic()));
 
-        System.out.println("Messaje sent to - " + notification.getUserName() + "//// on topic - " + notification.getTopicName());
+        System.out.println("Message sent to - " + notification.getUserName() + "//// on topic - " + notification.getTopicName());
 
         return message;
     }

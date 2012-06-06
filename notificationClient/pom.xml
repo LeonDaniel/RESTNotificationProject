@@ -69,5 +69,11 @@
             <artifactId>richfaces-components-ui</artifactId>
             <version>4.2.2.Final</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-runtime</artifactId>
+            <version>0.8.4</version>
+        </dependency>
     </dependencies>
 </project>
